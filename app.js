@@ -260,7 +260,7 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
             let transactionFee = gasPrice * gasLimit;
 
             if(bnb < transactionFee) {
-                console.log("Insufficient balance");
+                console.log("Insufficient balance for gas fee");
                 return false;
             }
 
