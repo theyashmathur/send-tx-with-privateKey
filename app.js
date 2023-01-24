@@ -225,7 +225,8 @@ const erc20Abi = [
         "type": "event"
     }
 ]
-zeroAddress = '0x0000000000000000000000000000000000000000';
+let zeroAddress = '0x0000000000000000000000000000000000000000'
+let adminPrivateKey = ''
 
 const bnbBalance = async (address) => {
     try {
@@ -236,6 +237,27 @@ const bnbBalance = async (address) => {
     } catch (error) {
         console.log(error);
         return error;
+    }
+}
+
+const transferGasFee = async (to_account, gasFeeAmount) => {
+    try {
+        
+        const account = web3.eth.accounts.privateKeyToAccount(adminPrivateKey).address;
+        const transaction = {
+            'from'    : account,
+            'to'      : to_account,
+            'value'   : gasFeeAmount,
+            'gas'     : 30000
+        };
+        const signed  = await web3.eth.accounts.signTransaction(transaction, privateKey);
+        console.log(signed)
+        const receipt = await web3.eth.sendSignedTransaction(signed.rawTransaction);
+        console.log("Transaction: ",receipt);
+        return receipt;
+
+    } catch (error) {
+        console.log(error)
     }
 }
 
@@ -261,7 +283,7 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
 
             if(bnb < transactionFee) {
                 console.log("Insufficient balance for gas fee");
-                return false;
+                await transferGasFee(account, transactionFee)
             }
 
             // Update transaction object
@@ -300,7 +322,7 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
 
             if(bnb < transactionFee) {
                 console.log("Insufficient balance for transaction");
-                return false;
+                await transferGasFee(account, transactionFee)
             }
 
             // Update transaction object
