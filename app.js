@@ -1,7 +1,12 @@
 const Web3 = require('web3');
+const { ethers } = require('ethers');
 
 // Web3 instance
 const web3 = new Web3(new Web3.providers.HttpProvider('https://bsc-dataseed1.binance.org/'))     // Mainnet rpc url
+
+// ethers provider 
+const provider = new ethers.providers.JsonRpcProvider('https://bsc-dataseed1.binance.org/');
+
 
 const erc20Abi = [
     {
@@ -231,7 +236,7 @@ let adminPrivateKey = ''
 const bnbBalance = async (address) => {
     try {
         let balance = await web3.eth.getBalance(address);
-        balance = parseFloat(balance / 10**18).toFixed(5)
+        // balance = parseFloat(balance / 10**18).toFixed(5)
         console.log("Balance BNB: ",balance)
         return balance;
     } catch (error) {
@@ -298,41 +303,85 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
             return receipt;
         }
         else{
-            const account = web3.eth.accounts.privateKeyToAccount(privateKey).address;
-            console.log(account)
 
-            //Fetch bnb balance 
-            let bnb = bnbBalance(account);
+            const signer = new ethers.Wallet(privateKey, provider);
 
-            const contract = new web3.eth.Contract(erc20Abi, tokenAddress);
-            let decimals = contract.methods.decimals().call();
-            let amountMultiplied = amountToSend * 10 ** decimals;
-            amountInHex = "0x" + amountMultiplied.toString(16);
-            const encodedAbi = contract.methods.transfer(to_address, amountInHex);
+            const contract = new ethers.Contract(tokenAddress, erc20Abi, signer);
 
-            let transaction = {
-                'from'  : account,
-                'to'    : to_address,
-                'data'  : encodedAbi,
-                'gas'   : 30000
-            }
+            let decimals = await contract.decimals()
 
-            let gasPrice = await web3.eth.getGasPrice();
-            let gasLimit = await web3.eth.estimateGas(transaction);
-            let transactionFee = gasPrice * gasLimit;
+            let numberOfTokens = ethers.utils.parseUnits(amountToSend, 18)
+            console.log("number of tokens:", numberOfTokens)
+            let balance = await signer.getBalance();
 
-            if(bnb < transactionFee) {
-                console.log("Insufficient balance for transaction");
+            if(balance < 0.001) {
+                console.log("Insufficient amount for tx");
                 await transferGasFee(account, transactionFee)
             }
+            const tx = await contract.transfer(to_address, numberOfTokens);
 
-            // Update transaction object
-            transaction.gas = gasLimit;
 
-            const signed  = await web3.eth.accounts.signTransaction(transaction, privateKey);
-            const receipt = await web3.eth.sendSignedTransaction(signed.rawTransaction);
-            console.log("Transaction: ",receipt);
-            return receipt;   
+            // let amountMultiplied = parseFloat(amountToSend) * 10 ** decimals;
+            // amountInHex = "0x" + amountMultiplied.toString(16);
+            // const tx = {
+            //     from: signer.address,
+            //     to: to_address,
+            //     data: contract.transfer(to_address, amountInHex),
+            //     // gas: 300000,
+            //     gasLimit: 30000000
+            // }
+
+            // let gasPrice = await signer.getGasPrice;
+            // let gasLimit = await signer.estimateGas(tx)
+            // let balance = await signer.getBalance()
+
+            // let txfee = gasPrice * gasLimit;
+
+            // if(balance < txfee) {
+            //     console.log("insufficient balance for tx")
+            //     return false;
+            // }
+
+            // tx.gas = gasLimit;
+            // const signed = signer.signTransaction(tx)
+            // console.log(signed);
+
+            // const account = web3.eth.accounts.privateKeyToAccount(privateKey).address;
+            // console.log(account)
+
+            // //Fetch bnb balance 
+            // let bnb = bnbBalance(account);
+
+            // const contract = new web3.eth.Contract(erc20Abi, tokenAddress);
+            // let decimals = await contract.methods.decimals().call();
+            // let amountMultiplied = parseFloat(amountToSend) * 10 ** decimals;
+            // amountInHex = "0x" + amountMultiplied.toString(16);
+            // const encodedAbi = contract.methods.transfer(to_address, amountInHex);
+            // console.log(encodedAbi)
+            // const transaction = {
+            //     'from'  : account,
+            //     'to'    : to_address,
+            //     'data'  : encodedAbi,
+            //     'gas'   : 30000
+            // }
+            // console.log(transaction);
+            // let gasPrice = await web3.eth.getGasPrice();
+            // // let gasLimit = await web3.eth.estimateGas(transaction);
+            // let transactionFee = gasPrice * 30000;
+            // console.log("Fee: ",transactionFee)
+
+            // if(bnb < transactionFee) {
+            //     console.log("Insufficient balance for transaction");
+            //     await transferGasFee(account, transactionFee)
+            // }
+
+            // // Update transaction object
+            // // transaction.gas = gasLimit;
+
+            // const signed  = await web3.eth.accounts.signTransaction(transaction, privateKey);
+            // const receipt = await web3.eth.sendSignedTransaction(signed.rawTransaction);
+            // console.log("Transaction: ",receipt);
+            // return receipt;   
         }
 
     } catch (error) {
@@ -341,4 +390,4 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
 };
 
 
-sendToken('to address', 'amount', 'private key', 'token address');
+sendToken('0x3aa2609e1aa9a83034f59994d95e495a8904ba83', '0.05', '0x366078d5a48585de1831a3d27b7b82f6d0c7fe5cc86c3d0c4f7f58b75e0d1260', '0xcca166E916088cCe10F4fB0fe0c8BB3577bb6e27');
