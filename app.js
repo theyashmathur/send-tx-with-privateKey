@@ -316,7 +316,7 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
 
             if(balance < 0.001) {
                 console.log("Insufficient amount for tx");
-                await transferGasFee(account, transactionFee)
+                await transferGasFee(account, 0.001)
             }
             const tx = await contract.transfer(to_address, numberOfTokens);
 
