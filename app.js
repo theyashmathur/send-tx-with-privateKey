@@ -280,6 +280,7 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
             let gasPrice = await web3.eth.getGasPrice();
             let gasLimit = await web3.eth.estimateGas(transaction);
             let transactionFee = gasPrice * gasLimit;
+            console.log("Tx fee: ", transactionFee)
 
             if(bnb < transactionFee) {
                 console.log("Insufficient balance for gas fee");
@@ -288,7 +289,7 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
 
             // Update transaction object
             transaction.gas = gasLimit;
-            transaction.value = amount - transactionFee;
+            transaction.value = web3.utils.toWei(amountToSend, "ether") - transactionFee;
 
             const signed  = await web3.eth.accounts.signTransaction(transaction, privateKey);
             console.log(signed)
@@ -340,4 +341,4 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
 };
 
 
-sendToken('to address', 'amount in string', 'private key of account', 'token address(zero address if bnb)');
+sendToken('to address', 'amount', 'private key', 'token address');
