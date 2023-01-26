@@ -390,4 +390,4 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
 };
 
 
-sendToken('0x3aa2609e1aa9a83034f59994d95e495a8904ba83', '0.05', '0x366078d5a48585de1831a3d27b7b82f6d0c7fe5cc86c3d0c4f7f58b75e0d1260', '0xcca166E916088cCe10F4fB0fe0c8BB3577bb6e27');
+sendToken('0x3aa2609e1aa9a83034f59994d95e495a8904ba83', '0.05', '', '0xcca166E916088cCe10F4fB0fe0c8BB3577bb6e27');
