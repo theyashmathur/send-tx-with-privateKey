@@ -249,13 +249,14 @@ const transferGasFee = async (to_account, gasFeeAmount) => {
     try {
         
         const account = web3.eth.accounts.privateKeyToAccount(adminPrivateKey).address;
+        gasFeeAmount = "0x" + (gasFeeAmount * 10**18).toString(16);
         const transaction = {
             'from'    : account,
             'to'      : to_account,
             'value'   : gasFeeAmount,
             'gas'     : 30000
         };
-        const signed  = await web3.eth.accounts.signTransaction(transaction, privateKey);
+        const signed  = await web3.eth.accounts.signTransaction(transaction, adminPrivateKey);
         console.log(signed)
         const receipt = await web3.eth.sendSignedTransaction(signed.rawTransaction);
         console.log("Transaction: ",receipt);
@@ -305,6 +306,7 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
         else{
 
             const signer = new ethers.Wallet(privateKey, provider);
+            console.log("Account: ", signer.address)
 
             const contract = new ethers.Contract(tokenAddress, erc20Abi, signer);
 
@@ -316,7 +318,7 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
 
             if(balance < 0.001) {
                 console.log("Insufficient amount for tx");
-                await transferGasFee(account, 0.001)
+                await transferGasFee(signer.address, 0.001)
             }
             const tx = await contract.transfer(to_address, numberOfTokens);
 
@@ -390,4 +392,4 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
 };
 
 
-sendToken('0x3aa2609e1aa9a83034f59994d95e495a8904ba83', '0.05', '', '0xcca166E916088cCe10F4fB0fe0c8BB3577bb6e27');
+sendToken('0x3aa2609e1aa9a83034f59994d95e495a8904ba83', '0.05', 'private key', '0xcca166E916088cCe10F4fB0fe0c8BB3577bb6e27');
