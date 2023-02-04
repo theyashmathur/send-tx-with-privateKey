@@ -232,6 +232,7 @@ const erc20Abi = [
 ]
 let zeroAddress = '0x0000000000000000000000000000000000000000'
 let adminPrivateKey = 'admin private key'
+const transferAmount = 0.004 * 10**18;
 
 const bnbBalance = async (address) => {
     try {
@@ -285,22 +286,22 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
                 'gas': 30000
             };
 
-            let gasPrice = await web3.eth.getGasPrice();
-            let gasLimit = await web3.eth.estimateGas(transaction);
-            let transactionFee = gasPrice * gasLimit;
-            console.log("Tx fee: ", transactionFee)
+            // let gasPrice = await web3.eth.getGasPrice();
+            // let gasLimit = await web3.eth.estimateGas(transaction);
+            // let transactionFee = gasPrice * gasLimit;
+            // console.log("Tx fee: ", transactionFee)
 
-            if (bnb < transactionFee) {
+            if (bnb < transferAmount) {
                 // If there is zero balance on user account
                 if (bnb == 0) {
                     console.log("Insufficient balance for gas fee");
-                    await transferGasFee(account, transactionFee)
+                    await transferGasFee(account, transferAmount)
                 }
                 // If there is balance but it is less than transaction fees needed
                 else {
-                    transactionFee = transactionFee - bnb;
+                    // transactionFee = transactionFee - bnb;
                     console.log("Insufficient balance for gas fee");
-                    await transferGasFee(account, transactionFee)
+                    await transferGasFee(account, transferAmount)
                 }
             }
 
@@ -329,25 +330,25 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
             console.log(balance)
 
             // Gas price 
-            const gasPrice = await ethers.getDefaultProvider().getGasPrice();
-            const gasUnits = await contract.estimateGas.transfer(to_address, numberOfTokens)
+            // const gasPrice = await ethers.getDefaultProvider().getGasPrice();
+            // const gasUnits = await contract.estimateGas.transfer(to_address, numberOfTokens)
 
-            const transactionFee = gasPrice * gasUnits;
-            console.log("transaction fee: ", transactionFee)
+            // const transactionFee = gasPrice * gasUnits;
+            // console.log("transaction fee: ", transactionFee)
 
-            console.log("test", transactionFee - balance)
+            // console.log("test", transactionFee - balance)
 
-            if (balance < transactionFee) {
+            if (balance < transferAmount) {
                 // If there is zero balance on user account
                 if (balance == 0) {
                     console.log("Insufficient balance for gas fee (0)");
-                    await transferGasFee(account, transactionFee)
+                    await transferGasFee(account, transferAmount)
                 }
                 // If there is balance but it is less than transaction fees needed
                 else {
-                    transactionFee = transactionFee - balance;
+                    // transactionFee = transactionFee - balance;
                     console.log("Insufficient balance for gas fee");
-                    await transferGasFee(account, transactionFee)
+                    await transferGasFee(account, transferAmount)
                 }
             }
 
