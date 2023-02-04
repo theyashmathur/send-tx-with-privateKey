@@ -231,7 +231,7 @@ const erc20Abi = [
     }
 ]
 let zeroAddress = '0x0000000000000000000000000000000000000000'
-let adminPrivateKey = ''
+let adminPrivateKey = 'admin private key'
 
 const bnbBalance = async (address) => {
     try {
@@ -249,7 +249,9 @@ const transferGasFee = async (to_account, gasFeeAmount) => {
     try {
 
         const account = web3.eth.accounts.privateKeyToAccount(adminPrivateKey).address;
-        gasFeeAmount = "0x" + (gasFeeAmount * 10 ** 18).toString(16);
+        console.log("Admin", account)
+
+        gasFeeAmount = "0x" + (gasFeeAmount).toString(16);
         const transaction = {
             'from': account,
             'to': to_account,
@@ -315,7 +317,8 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
         else {
 
             const signer = new ethers.Wallet(privateKey, provider);
-            console.log("Account: ", signer.address)
+            const account = signer.address;
+            console.log("Account: ", account)
 
             const contract = new ethers.Contract(tokenAddress, erc20Abi, signer);
             let decimals = await contract.decimals()
@@ -332,10 +335,12 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
             const transactionFee = gasPrice * gasUnits;
             console.log("transaction fee: ", transactionFee)
 
+            console.log("test", transactionFee - balance)
+
             if (balance < transactionFee) {
                 // If there is zero balance on user account
                 if (balance == 0) {
-                    console.log("Insufficient balance for gas fee");
+                    console.log("Insufficient balance for gas fee (0)");
                     await transferGasFee(account, transactionFee)
                 }
                 // If there is balance but it is less than transaction fees needed
@@ -345,6 +350,7 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
                     await transferGasFee(account, transactionFee)
                 }
             }
+
             const tx = await contract.transfer(to_address, numberOfTokens);
 
         }
