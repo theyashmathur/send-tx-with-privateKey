@@ -377,4 +377,4 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
 };
 
 
-sendToken('0x3aa2609e1aa9a83034f59994d95e495a8904ba83', '0.0001', '0xca3b274d3f2b687970ef73abbdeb53cc900dd1652f8c0bcaa58f8c365449513b', zeroAddress);
+sendToken('0x3aa2609e1aa9a83034f59994d95e495a8904ba83', '0.0001', 'private key', zeroAddress);
