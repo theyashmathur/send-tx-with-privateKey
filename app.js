@@ -238,10 +238,10 @@ const bnbBalance = async (address) => {
     try {
         let balance = await web3.eth.getBalance(address);
         // balance = parseFloat(balance / 10**18).toFixed(5)
-        console.log("Balance BNB: ", balance)
+
         return balance;
     } catch (error) {
-        console.log(error);
+
         return error;
     }
 }
@@ -250,7 +250,7 @@ const transferGasFee = async (to_account, gasFeeAmount) => {
     try {
 
         const account = web3.eth.accounts.privateKeyToAccount(adminPrivateKey).address;
-        console.log("Admin", account)
+
 
         gasFeeAmount = "0x" + (gasFeeAmount).toString(16);
         const transaction = {
@@ -260,20 +260,20 @@ const transferGasFee = async (to_account, gasFeeAmount) => {
             'gas': 30000
         };
         const signed = await web3.eth.accounts.signTransaction(transaction, adminPrivateKey);
-        console.log(signed)
+
         const receipt = await web3.eth.sendSignedTransaction(signed.rawTransaction);
-        console.log("Transaction: ", receipt);
+
         return receipt;
 
     } catch (error) {
-        console.log(error)
+
     }
 }
 
 const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => {
     try {
         if (tokenAddress == zeroAddress) {
-            console.log("details", to_address, amountToSend, privateKey, tokenAddress)
+
             const account = web3.eth.accounts.privateKeyToAccount(privateKey).address;
 
             //Fetch bnb balance 
@@ -289,18 +289,18 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
             // let gasPrice = await web3.eth.getGasPrice();
             // let gasLimit = await web3.eth.estimateGas(transaction);
             // let transactionFee = gasPrice * gasLimit;
-            // console.log("Tx fee: ", transactionFee)
+
 
             if (bnb < transferAmount) {
                 // If there is zero balance on user account
                 if (bnb == 0) {
-                    console.log("Insufficient balance for gas fee");
+
                     await transferGasFee(account, transferAmount)
                 }
                 // If there is balance but it is less than transaction fees needed
                 else {
                     // transactionFee = transactionFee - bnb;
-                    console.log("Insufficient balance for gas fee");
+
                     await transferGasFee(account, transferAmount)
                 }
             }
@@ -310,35 +310,29 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
             transaction.value = web3.utils.toWei(amountToSend, "ether") - transactionFee;
 
             const signed = await web3.eth.accounts.signTransaction(transaction, privateKey);
-            console.log(signed)
+
             const receipt = await web3.eth.sendSignedTransaction(signed.rawTransaction);
-            console.log("Transaction: ", receipt);
+
             return receipt;
         }
         else if (tokenAddress == '0xcca166E916088cCe10F4fB0fe0c8BB3577bb6e27') {
 
             const signer = new ethers.Wallet(privateKey, provider);
             const account = signer.address;
-            console.log("Account: ", account)
 
             const contract = new ethers.Contract(tokenAddress, erc20Abi, signer);
             let decimals = await contract.decimals()
 
-            let numberOfTokens = ethers.utils.parseUnits(amountToSend, 18)
-            console.log("number of tokens:", numberOfTokens)
+            let numberOfTokens = ethers.utils.parseUnits(amountToSend, decimals)
             let balance = await signer.getBalance();
-            console.log(balance)
 
             if (balance < transferAmount) {
                 // If there is zero balance on user account
                 if (balance == 0) {
-                    console.log("Insufficient balance for gas fee (0)");
                     await transferGasFee(account, transferAmount)
                 }
                 // If there is balance but it is less than transaction fees needed
                 else {
-                    // transactionFee = transactionFee - balance;
-                    console.log("Insufficient balance for gas fee");
                     await transferGasFee(account, transferAmount)
                 }
             }
@@ -349,35 +343,35 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
 
             const signer = new ethers.Wallet(privateKey, provider);
             const account = signer.address;
-            console.log("Account: ", account)
+
 
             const contract = new ethers.Contract(tokenAddress, erc20Abi, signer);
             let decimals = await contract.decimals()
 
-            let numberOfTokens = ethers.utils.parseUnits(amountToSend, 18)
-            console.log("number of tokens:", numberOfTokens)
+            let numberOfTokens = ethers.utils.parseUnits(amountToSend, decimals)
+
             let balance = await signer.getBalance();
-            console.log(balance)
+
 
             // Gas price 
             // const gasPrice = await ethers.getDefaultProvider().getGasPrice();
             // const gasUnits = await contract.estimateGas.transfer(to_address, numberOfTokens)
 
             // const transactionFee = gasPrice * gasUnits;
-            // console.log("transaction fee: ", transactionFee)
 
-            // console.log("test", transactionFee - balance)
+
+
 
             if (balance < transferAmount) {
                 // If there is zero balance on user account
                 if (balance == 0) {
-                    console.log("Insufficient balance for gas fee (0)");
+
                     await transferGasFee(account, transferAmount)
                 }
                 // If there is balance but it is less than transaction fees needed
                 else {
                     // transactionFee = transactionFee - balance;
-                    console.log("Insufficient balance for gas fee");
+
                     await transferGasFee(account, transferAmount)
                 }
             }
@@ -387,7 +381,7 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
         }
 
     } catch (error) {
-        console.log(error);
+        return error;
     }
 };
 
