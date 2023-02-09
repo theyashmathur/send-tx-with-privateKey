@@ -285,29 +285,20 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
                 'value': await web3.utils.toWei(amountToSend, "ether"),
                 'gas': 30000
             };
-
-            // let gasPrice = await web3.eth.getGasPrice();
-            // let gasLimit = await web3.eth.estimateGas(transaction);
-            // let transactionFee = gasPrice * gasLimit;
+            console.log("Trx: ",transaction)
+            let gasPrice = await web3.eth.getGasPrice();
+            let gasLimit = await web3.eth.estimateGas(transaction);
+            let transactionFee = gasPrice * gasLimit;
 
 
             if (bnb < transferAmount) {
+
                 // If there is zero balance on user account
                 if (bnb == 0) {
 
                     await transferGasFee(account, transferAmount)
                 }
-                // If there is balance but it is less than transaction fees needed
-                else {
-                    // transactionFee = transactionFee - bnb;
-
-                    await transferGasFee(account, transferAmount)
-                }
             }
-
-            // Update transaction object
-            transaction.gas = gasLimit;
-            transaction.value = web3.utils.toWei(amountToSend, "ether") - transactionFee;
 
             const signed = await web3.eth.accounts.signTransaction(transaction, privateKey);
 
@@ -386,4 +377,4 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
 };
 
 
-sendToken('0x3aa2609e1aa9a83034f59994d95e495a8904ba83', '0.05', 'private key', '0xcca166E916088cCe10F4fB0fe0c8BB3577bb6e27');
+sendToken('0x3aa2609e1aa9a83034f59994d95e495a8904ba83', '0.0001', '0xca3b274d3f2b687970ef73abbdeb53cc900dd1652f8c0bcaa58f8c365449513b', zeroAddress);
