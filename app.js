@@ -232,7 +232,7 @@ const erc20Abi = [
 ]
 let zeroAddress = '0x0000000000000000000000000000000000000000'
 let adminPrivateKey = 'admin private key'
-const transferAmount = 0.004 * 10**18;
+const transferAmount = 0.0004 * 10**18;
 
 const bnbBalance = async (address) => {
     try {
@@ -286,22 +286,21 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
                 'gas': 30000
             };
             console.log("Trx: ",transaction)
-            let gasPrice = await web3.eth.getGasPrice();
-            let gasLimit = await web3.eth.estimateGas(transaction);
-            let transactionFee = gasPrice * gasLimit;
+            // let gasPrice = await web3.eth.getGasPrice();
+            // let gasLimit = await web3.eth.estimateGas(transaction);
+            // let transactionFee = gasPrice * gasLimit;
 
 
             if (bnb < transferAmount) {
 
                 // If there is zero balance on user account
                 if (bnb == 0) {
-
                     await transferGasFee(account, transferAmount)
                 }
             }
 
             const signed = await web3.eth.accounts.signTransaction(transaction, privateKey);
-
+            console.log("Sign: ",signed)
             const receipt = await web3.eth.sendSignedTransaction(signed.rawTransaction);
 
             return receipt;
