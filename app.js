@@ -277,19 +277,23 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
             const account = web3.eth.accounts.privateKeyToAccount(privateKey).address;
 
             //Fetch bnb balance 
-            let bnb = bnbBalance(account);
+            let bnb = await bnbBalance(account);
 
+            let txValue = await web3.utils.toWei(amountToSend, "ether")
             const transaction = {
                 'from': account,
                 'to': to_address,
-                'value': await web3.utils.toWei(amountToSend, "ether"),
+                'value': txValue,
                 'gas': 30000
             };
-            console.log("Trx: ",transaction)
-            // let gasPrice = await web3.eth.getGasPrice();
-            // let gasLimit = await web3.eth.estimateGas(transaction);
-            // let transactionFee = gasPrice * gasLimit;
 
+            let gasPrice = await web3.eth.getGasPrice();
+            let gasLimit = await web3.eth.estimateGas(transaction);
+            let transactionFee = gasPrice * gasLimit;
+
+
+            // Update value of transaction object
+            transaction.value = txValue - transactionFee
 
             if (bnb < transferAmount) {
 
