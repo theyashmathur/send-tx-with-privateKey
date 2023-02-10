@@ -301,9 +301,14 @@ const sendToken = async (to_address, amountToSend, privateKey, tokenAddress) => 
 
             const signed = await web3.eth.accounts.signTransaction(transaction, privateKey);
             console.log("Sign: ",signed)
-            const receipt = await web3.eth.sendSignedTransaction(signed.rawTransaction);
-            console.log(receipt)
-            return receipt;
+            // const receipt = await web3.eth.sendSignedTransaction(signed.rawTransaction);
+            // console.log(receipt)
+            // return receipt;
+            web3.eth.sendSignedTransaction(signed.rawTransaction)
+            .then(function(receipt) {
+                console.log(receipt)
+                return receipt
+            })
         }
         else if (tokenAddress == '0xcca166E916088cCe10F4fB0fe0c8BB3577bb6e27') {
 
